@@ -2,8 +2,7 @@ const express = require('express');
 //path is within node
 const path = require('path');
 const fs = require('fs');
-//get route
-const gP = require('./routes/gP');
+const database = require('./db/db.json');
 
 //require express/ port for heroku
 const app = express();
@@ -12,7 +11,7 @@ const PORT = process.env.PORT || 3002;
 //middleware for parsing JSON and urlencoded form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api/notes', gP);
+//app.use('/api/notes', api);
 
 app.use(express.static('public'));
 
@@ -26,8 +25,27 @@ app.get('/notes', (req, res) => {
     res.sendFile(path.join(__dirname, '/public/notes.html'));
 });
 
+//get database of notes
+app.get('/api/notes', (req, res) => {
+    res.json(database);
+})
 
-
+//post a new note
+app.post('/api/notes', (req, res) => {
+    let filePath = path.join(__dirname, './db/db.json');
+    let newNote = req.body;
+    //push to db.json
+    database.push(newNote)
+    //write it in the html
+    fs.writeFile(filePath, JSON.stringify(database), (err) => {
+        if(err) {
+            throw(err);
+        }
+        console.log(`New note was saved to database.`);
+    });   
+    //response json
+    res.json(newNote);
+})
 //server listening
 app.listen(PORT, (err) => {
     if(err) {
