@@ -11,7 +11,6 @@ const PORT = process.env.PORT || 3002;
 //middleware for parsing JSON and urlencoded form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//app.use('/api/notes', api);
 
 app.use(express.static('public'));
 
@@ -45,6 +44,28 @@ app.post('/api/notes', (req, res) => {
     });   
     //response json
     res.json(newNote);
+})
+
+//delete note
+app.delete('/api/notes/:id', (req, res) => {
+    let filePath = path.join(__dirname, './db/db.json');
+    //request to delete note
+    for(let i = 0; i < database.length; i++) {
+        //if(database[i] == req.params[i]) {
+            database.splice(i, 1);
+            break;
+        //}
+    }
+    //write file
+    fs.writeFileSync(filePath, JSON.stringify(database), (err) => {
+        if(err) {
+            throw(err);
+        } else {
+            console.log(`Note deleted.`);
+        }
+    });
+    //response json
+    res.json(database)
 })
 //server listening
 app.listen(PORT, (err) => {
