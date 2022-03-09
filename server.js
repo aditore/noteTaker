@@ -33,6 +33,19 @@ app.get('/api/notes', (req, res) => {
 app.post('/api/notes', (req, res) => {
     let filePath = path.join(__dirname, './db/db.json');
     let newNote = req.body;
+    //add id
+    //this allows for a saved note to be given an id
+    let testId = 50;
+    //find ids
+    for(let i = 0; i < database.length; i++) {
+        let noteId = database[i];
+
+        if(noteId.id > testId) {
+            testId = noteId.id;
+        }
+    }
+    //new note id will always be one higher
+    newNote.id = testId + 1;
     //push to db.json
     database.push(newNote)
     //write it in the html
